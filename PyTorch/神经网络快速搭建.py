@@ -1,0 +1,40 @@
+import torch
+from torch.autograd import Variable # Variable变量
+import torch.nn.functional as F # 常用工具
+
+import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+
+x = torch.unsqueeze(torch.linspace(-1, 1, 100), dim=1)  # 随机生成100个数的等差数列
+y = x.pow(2) + 0.2*torch.rand(x.size())
+
+x,y = Variable(x), Variable(y)  # 转化为Variable变量
+
+# plt.scatter(x.data.numpy(), y.data.numpy())
+# plt.show()
+
+
+# 构建神经网络类
+class Net(torch.nn.Module): # 继承父类
+    def __init__(self, n_feature, n_hidden, n_output):  # 实例化时接收输入个数，隐层神经元个数和输出个数三个参数
+        super(Net, self).__init__() # 继承父类的初始化函数
+        self.hidden = torch.nn.Linear(n_feature, n_hidden)  # 把输入数据转化成隐层神经元
+        self.predict = torch.nn.Linear(n_hidden, n_output) # 把隐层神经元个数输出为预测结果
+
+    def forward(self, x):
+        x = F.relu(self.hidden(x))
+        x = self.predict(x)
+        return x
+
+
+net = Net(1, 10, 1)
+
+# 简单构建
+net1 = torch.nn.Sequential(
+    torch.nn.Linear(1, 10),
+    torch.nn.ReLU(),
+    torch.nn.Linear(10, 1)
+)
+
+print(net)
+print(net1)
